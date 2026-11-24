@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.maateen.me/kalpurush/font.css" rel="stylesheet">
+<title>AI গোল্ড ও সিলভার পূর্বাভাস</title>
+<style>
+:root{color-scheme:dark;--bg:#090f1c;--card:#121d30;--card2:#17243a;--tx:#edf2fb;--mu:#9baac0;--gold:#e8bd62;--up:#35c98a;--dn:#f07178;--bd:rgba(164,184,211,.16);--shadow:0 12px 30px rgba(0,0,0,.22)}
+*{box-sizing:border-box}
+body{margin:0 auto;padding:20px 14px 26px;background:radial-gradient(ellipse at 50% -12%,#263b5c 0%,#101a2b 36%,var(--bg) 75%);color:var(--tx);font-family:"Kalpurush",system-ui,"Noto Sans Bengali",sans-serif;max-width:760px;min-height:100vh}
+h1{font-size:1.35rem;line-height:1.5;color:var(--gold);margin:2px 2px 18px;padding:2px 0 12px;border-bottom:1px solid var(--bd);letter-spacing:.1px}
+h2{font-size:1.02rem;line-height:1.5;margin:0 0 12px;color:#f3d99f}
+.card{background:linear-gradient(145deg,rgba(26,42,65,.98),rgba(16,27,44,.98));border:1px solid var(--bd);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+label{font-size:.82rem;color:var(--mu);display:block;margin-bottom:6px}
+select,input,button,textarea{font-family:inherit}
+select,input,button{width:100%;font:inherit;padding:11px 10px;border-radius:11px;border:1px solid rgba(164,184,211,.22);background:#0d1727;color:var(--tx);outline:none;min-width:0}
+select:focus,input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,189,98,.12)}
+button{background:linear-gradient(110deg,#d6a64d,#f0d18a);color:#172033;border:0;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(214,166,77,.2);transition:transform .18s,filter .18s}
+button:active{transform:scale(.985);filter:brightness(.96)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.price{font-size:2.25rem;font-weight:800;letter-spacing:.3px;color:#f5d58f;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.big{font-size:1.2rem;font-weight:800;line-height:1.55}
+.up{color:var(--up)}.dn{color:var(--dn)}.mu{color:var(--mu);font-size:.84rem;line-height:1.55}
+#cv{width:100%;height:290px;display:block}
+.chart-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+.chart-title{font-size:1.02rem;font-weight:700;color:#f3d99f}
+.chart-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.72rem;color:var(--mu)}
+.legend-item{display:inline-flex;align-items:center;gap:4px}.legend-dot{width:8px;height:8px;border-radius:3px;display:inline-block}
+.chart-card{padding:14px 10px 10px;overflow:hidden}.chart-foot{font-size:.72rem;color:var(--mu);text-align:center;margin-top:5px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}td,th{padding:9px 7px;border-bottom:1px solid var(--bd);text-align:left;line-height:1.5}th{color:#e8c77f;font-weight:700}tr:last-child td{border-bottom:0}
+#err{color:var(--dn);font-size:.9rem;margin-top:7px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--up);margin-right:5px;animation:b 1s infinite}@keyframes b{50%{opacity:.2}}
+.bar{height:10px;border-radius:8px;background:linear-gradient(90deg,var(--dn),#59677c,var(--up));position:relative;margin:12px 0}.bar i{position:absolute;top:-4px;width:4px;height:18px;background:#fff;border:1px solid #0b1422;border-radius:3px;transform:translateX(-2px);box-shadow:0 0 8px rgba(255,255,255,.5)}
+.warn{background:rgba(240,113,120,.09);border:1px solid rgba(240,113,120,.45);color:#ffb0b4;border-radius:11px;padding:10px;margin-top:10px;font-size:.86rem;line-height:1.5}
+#sig{padding:2px 0}#trade{margin-top:10px}
+@media(max-width:420px){body{padding:14px 10px 22px}.card{padding:13px;border-radius:15px}.grid{gap:7px}select,input{padding:9px 7px;font-size:.88rem}label{font-size:.76rem}.price{font-size:2rem}#cv{height:260px}.chart-legend{gap:7px;font-size:.68rem}td,th{padding:8px 5px;font-size:.84rem}}
+</style>
+</head>
+<body>
+<h1>🥇 AI লাইভ গোল্ড ও সিলভার পূর্বাভাস</h1>
+
+<div class="card">
+  <div class="grid">
+    <div><label>ধাতু</label>
+      <select id="metal"><option value="XAU">গোল্ড (XAU)</option><option value="XAG">সিলভার (XAG)</option></select></div>
+    <div><label>টাইমফ্রেম</label>
+      <select id="tf">
+        <option value="1m">১ মিনিট</option><option value="5m" selected>৫ মিনিট</option>
+        <option value="15m">১৫ মিনিট</option><option value="30m">৩০ মিনিট</option>
+        <option value="1h">১ ঘন্টা</option><option value="4h">৪ ঘন্টা</option>
+      </select></div>
+    <div><label>কয়টি ক্যান্ডেল পরের পূর্বাভাস</label>
+      <input id="h" type="number" min="1" max="30" value="3"></div>
+  </div>
+  <div style="margin-top:8px"><button onclick="forceLoad()">এখনই আপডেট ও AI রিট্রেন</button></div>
+  <div id="err"></div>
+</div>
+
+<div class="card">
+  <div class="mu"><span class="dot"></span><span id="src">লোড হচ্ছে…</span> • প্রতি ৫ সেকেন্ডে আপডেট</div>
+  <div class="price" id="price">--</div>
+  <div class="mu" id="chg"></div>
+</div>
+
+<div class="card">
+  <div class="big" id="sig">--</div>
+  <div class="bar"><i id="pin" style="left:50%"></i></div>
+  <div class="mu" id="why"></div>
+  <div id="gate"></div>
+  <table style="margin-top:8px" id="trade"></table>
+</div>
+
+<div class="card"><h2>পরবর্তী সময়ের সম্ভাব্য প্রাইস পথ</h2><table id="fc"></table>
+  <div class="mu">এটি ট্রেন্ড-ভিত্তিক পথ; দিক নির্ধারণ করে AI ensemble।</div></div>
+<div class="card chart-card">
+  <div class="chart-head"><div class="chart-title">প্রাইস চার্ট</div>
+    <div class="chart-legend">
+      <span class="legend-item"><i class="legend-dot" style="background:#16a34a"></i>বুলিশ</span>
+      <span class="legend-item"><i class="legend-dot" style="background:#dc5252"></i>বেয়ারিশ</span>
+      <span class="legend-item"><i class="legend-dot" style="background:#b8860b"></i>পূর্বাভাস</span>
+    </div>
+  </div>
+  <canvas id="cv"></canvas>
+  <div class="chart-foot">ক্যান্ডেল = OHLC প্রাইস • ড্যাশ লাইন = সাপোর্ট / রেজিস্ট্যান্স</div>
+</div>
+
+<div class="card"><h2>AI যাচাই (Walk-forward ব্যাকটেস্ট)</h2><table id="bt"></table>
+  <div class="mu" id="btnote"></div></div>
+<div class="card"><table id="ind"></table></div>
+
+
+<script>
+const $=id=>document.getElementById(id);
+const MS={'1m':6e4,'5m':3e5,'15m':9e5,'30m':18e5,'1h':36e5,'4h':144e5};
+const HT={'1m':'15m','5m':'1h','15m':'1h','30m':'4h','1h':'4h','4h':'1d'};
+const tfName={'1m':'১ মিনিট','5m':'৫ মিনিট','15m':'১৫ মিনিট','30m':'৩০ মিনিট','1h':'১ ঘন্টা','4h':'৪ ঘন্টা'};
+const SRC={
+  XAU:[['Binance Futures XAUUSDT','https://fapi.binance.com/fapi/v1/klines?symbol=XAUUSDT'],
+       ['Binance Spot PAXG (গোল্ড-ব্যাকড)','https://api.binance.com/api/v3/klines?symbol=PAXGUSDT'],
+       ['Binance Vision PAXG','https://data-api.binance.vision/api/v3/klines?symbol=PAXGUSDT']],
+  XAG:[['Binance Futures XAGUSDT','https://fapi.binance.com/fapi/v1/klines?symbol=XAGUSDT']]
+};
+let K=[],model=null,busy=false,srcUrl=null;
+const fmt=v=>v>=100?v.toFixed(2):v.toFixed(3);
+
+/* ---------- ডেটা ---------- */
+async function fetchK(u,tf,limit){
+  const r=await fetch(`${u}&interval=${tf}&limit=${limit}`);
+  if(!r.ok)throw new Error(r.status);
+  return (await r.json()).map(x=>({t:x[0],o:+x[1],h:+x[2],l:+x[3],c:+x[4]}));
+}
+async function load(){
+  if(busy)return;busy=true;
+  const m=$('metal').value,tf=$('tf').value;$('err').textContent='';
+  let ok=false;
+  for(const [name,u] of SRC[m]){
+    try{K=await fetchK(u,tf,1000);srcUrl=u;$('src').textContent='লাইভ • '+name;ok=true;break}catch(e){}
+  }
+  if(!ok){$('err').textContent='ডেটা আনা যায়নি। ইন্টারনেট/VPN চেক করুন (কিছু দেশে Binance ব্লক থাকে)।';busy=false;return}
+  try{await analyze()}catch(e){$('err').textContent='ত্রুটি: '+e.message}
+  busy=false;
+}
+function forceLoad(){model=null;load()}
+
+/* ---------- ইন্ডিকেটর ---------- */
+function ema(a,n){const k=2/(n+1);let e=a[0];return a.map((v,i)=>i?(e=v*k+e*(1-k)):e)}
+function rsiSeries(a,n=14){
+  const o=new Array(a.length).fill(50);let g=0,l=0;
+  for(let i=1;i<=n;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d}g/=n;l/=n;o[n]=l?100-100/(1+g/l):100;
+  for(let i=n+1;i<a.length;i++){const d=a[i]-a[i-1];g=(g*(n-1)+Math.max(d,0))/n;l=(l*(n-1)+Math.max(-d,0))/n;o[i]=l?100-100/(1+g/l):100}
+  return o}
+function atr(K,n=14){let t=0,v=[];for(let i=1;i<K.length;i++)v.push(Math.max(K[i].h-K[i].l,Math.abs(K[i].h-K[i-1].c),Math.abs(K[i].l-K[i-1].c)));
+  t=v.slice(0,n).reduce((a,b)=>a+b,0)/n;for(let i=n;i<v.length;i++)t=(t*(n-1)+v[i])/n;return t}
+function indicators(a){
+  const n=a.length,r=new Array(n).fill(0);for(let i=1;i<n;i++)r[i]=Math.log(a[i]/a[i-1]);
+  const vol=new Array(n).fill(1e-4);
+  for(let i=20;i<n;i++){let m=0;for(let j=i-19;j<=i;j++)m+=r[j];m/=20;let s=0;for(let j=i-19;j<=i;j++)s+=(r[j]-m)**2;vol[i]=Math.sqrt(s/19)||1e-4}
+  const e10=ema(a,10),e20=ema(a,20),e12=ema(a,12),e26=ema(a,26),mac=e12.map((v,i)=>v-e26[i]),sg=ema(mac,9);
+  return{r,vol,e10,e20,mh:mac.map((v,i)=>v-sg[i]),rsi:rsiSeries(a)};
+}
+const clip=x=>Math.max(-3,Math.min(3,x));
+const D=8;
+function feat(I,a,i){const v=I.vol[i];
+  return[clip(I.r[i]/v),clip(I.r[i-1]/v),clip(I.r[i-2]/v),clip(Math.log(a[i]/a[i-5])/(v*2.236)),clip(Math.log(a[i]/a[i-10])/(v*3.162)),
+    (I.rsi[i]-50)/25,clip(I.mh[i]/(a[i]*v)*3),clip((I.e10[i]-I.e20[i])/(a[i]*v))]}
+
+/* ---------- মডেল: Logistic + MLP + Damped Holt ---------- */
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const sig=z=>1/(1+Math.exp(-Math.max(-30,Math.min(30,z))));
+function trainLR(X,Y,idx,rand){
+  const w=new Array(D).fill(0);let b=0;
+  for(let ep=0;ep<60;ep++){
+    for(let k=idx.length-1;k>0;k--){const j=Math.floor(rand()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
+    for(const i of idx){let z=b;for(let d=0;d<D;d++)z+=w[d]*X[i][d];const e=sig(z)-Y[i];
+      for(let d=0;d<D;d++)w[d]-=0.02*(e*X[i][d]+0.01*w[d]);b-=0.02*e}
+  }
+  return x=>{let z=b;for(let d=0;d<D;d++)z+=w[d]*x[d];return sig(z)}
+}
+function trainMLP(X,Y,idx,rand,H=10){
+  const W1=Array.from({length:H},()=>Array.from({length:D},()=>(rand()-.5)*.6)),b1=new Array(H).fill(0),
+        W2=Array.from({length:H},()=>(rand()-.5)*.6);let b2=0;
+  const fw=x=>{const hz=new Array(H);let o=b2;for(let j=0;j<H;j++){let z=b1[j];for(let d=0;d<D;d++)z+=W1[j][d]*x[d];hz[j]=Math.tanh(z);o+=W2[j]*hz[j]}return[sig(o),hz]};
+  for(let ep=0;ep<80;ep++){
+    for(let k=idx.length-1;k>0;k--){const j=Math.floor(rand()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
+    const lr=0.03*(1-ep/100);
+    for(const i of idx){const[x,y]=[X[i],Y[i]],[o,hz]=fw(x),dz=o-y;
+      for(let j=0;j<H;j++){const w2=W2[j],dh=dz*w2*(1-hz[j]*hz[j]);
+        W2[j]-=lr*(dz*hz[j]+0.01*w2);
+        for(let d=0;d<D;d++)W1[j][d]-=lr*(dh*x[d]+0.01*W1[j][d]);b1[j]-=lr*dh}
+      b2-=lr*dz}
+  }
+  return x=>fw(x)[0];
+}
+function cdf(z){const t=1/(1+.2316419*Math.abs(z)),d=.3989423*Math.exp(-z*z/2);
+  const p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p}
+function holtRun(a,al=.35,be=.15,phi=.92){
+  let L=a[0],T=a[1]-a[0];const Ts=[T],res=[];
+  for(let i=1;i<a.length;i++){const p=L+phi*T;res.push(a[i]-p);const nL=al*a[i]+(1-al)*p;T=be*(nL-L)+(1-be)*phi*T;L=nL;Ts.push(T)}
+  const sd=Math.sqrt(res.reduce((s,x)=>s+x*x,0)/res.length);
+  return{L,T,Ts,sd,phi}
+}
+const accum=(phi,h)=>{let s=0,p=1;for(let i=1;i<=h;i++){p*=phi;s+=p}return s};
+
+function train(a,h){
+  const n=a.length,I=indicators(a),HS=holtRun(a),acc=accum(HS.phi,h);
+  const X=[],Y=[],S=[];
+  for(let i=30;i<n-h;i++){X[i]=feat(I,a,i);Y[i]=a[i+h]>a[i]?1:0;S.push(i)}
+  const split=Math.floor(S.length*.7),testIdx=S.slice(split),trainIdx=S.filter(i=>i<S[split]-h);
+  const pH=i=>cdf(HS.Ts[i]*acc/(HS.sd*Math.sqrt(h)));
+  /* walk-forward: অদেখা ডেটায় পরীক্ষা */
+  const lr1=trainLR(X,Y,[...trainIdx],rng(7)),ml1=trainMLP(X,Y,[...trainIdx],rng(11));
+  let c={L:0,M:0,H:0,E:0,conf:0,confOk:0},up=0;
+  for(const i of testIdx){const pl=lr1(X[i]),pm=ml1(X[i]),ph=pH(i),pe=(pl+pm+ph)/3,y=Y[i];up+=y;
+    c.L+=(pl>.5)==y;c.M+=(pm>.5)==y;c.H+=(ph>.5)==y;c.E+=(pe>.5)==y;
+    if(Math.abs(pe-.5)>=.08){c.conf++;c.confOk+=(pe>.5)==y}}
+  const N=testIdx.length,base=Math.max(up,N-up)/N,accE=c.E/N;
+  const gate=N>=100&&accE>=0.53&&accE>=base+0.03;
+  /* চূড়ান্ত মডেল: সব ডেটায় রিট্রেন */
+  const all=S.filter(i=>true);
+  const lr=trainLR(X,Y,[...all],rng(7)),ml=trainMLP(X,Y,[...all],rng(11));
+  return{key:'',lr,ml,eval:{N,base,accL:c.L/N,accM:c.M/N,accH:c.H/N,accE,conf:c.conf,confAcc:c.conf?c.confOk/c.conf:null,gate}};
+}
+
+/* ---------- বিশ্লেষণ ---------- */
+async function analyze(){
+  const a=K.map(d=>d.c),n=a.length,h=Math.min(30,Math.max(1,+$('h').value||3)),tf=$('tf').value;
+  if(n<120){$('err').textContent='পর্যাপ্ত ডেটা নেই';return}
+  const last=a[n-1],prev=a[n-2];
+  $('price').textContent=fmt(last)+' USD';
+  const ch=last-prev;$('chg').innerHTML=`<span class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${fmt(Math.abs(ch))} (${(ch/prev*100).toFixed(3)}%)</span> গত ক্যান্ডেল থেকে`;
+
+  const key=[$('metal').value,tf,h,K[n-2].t].join('|');
+  if(!model||model.key!==key){
+    $('sig').textContent='🧠 AI ট্রেনিং চলছে…';
+    await new Promise(r=>setTimeout(r,30));
+    model=train(a.slice(0,n-1),h);model.key=key;
+    model.ht=null;
+    try{
+      const hk=await fetchK(srcUrl,HT[tf],200),hc=hk.map(d=>d.c),e20=ema(hc,20).pop(),e50=ema(hc,50).pop();
+      model.ht={tf:HT[tf],dir:e20>e50?1:-1,above:hc[hc.length-1]>e50};
+    }catch(e){}
+  }
+  const I=indicators(a),x=feat(I,a,n-1),HS=holtRun(a),acc=accum(HS.phi,h);
+  const pL=model.lr(x),pM=model.ml(x),pH=cdf(HS.Ts[n-1]*acc/(HS.sd*Math.sqrt(h))),P=(pL+pM+pH)/3;
+  const ev=model.eval,side=P>.5?1:-1,votes=[pL,pM,pH].filter(p=>(p>.5)==(P>.5)).length;
+  const htAgree=model.ht?(model.ht.dir===side):null;
+  let dir,cls,conf;
+  const strong=Math.abs(P-.5)>=.08;
+  if(!ev.gate){dir='⏸️ ট্রেড করবেন না (AI-এর স্পষ্ট এজ নেই)';cls='';conf='কম'}
+  else if(!strong){dir='⚖️ নিরপেক্ষ / অপেক্ষা';cls='';conf='কম'}
+  else{
+    dir=side>0?'📈 BUY (ঊর্ধ্বমুখী)':'📉 SELL (নিম্নমুখী)';cls=side>0?'up':'dn';
+    conf=(votes===3&&htAgree!==false&&(ev.confAcc||0)>=.55)?'উচ্চ':(votes>=2&&htAgree!==false)?'মধ্যম':'কম';
+    if(htAgree===false)dir+=' — বড় ট্রেন্ডের বিপরীতে!';
+  }
+  const el=$('sig');el.textContent=dir+` • পরবর্তী ${h} × ${tfName[tf]}`;el.className='big '+cls;
+  $('pin').style.left=(P*100).toFixed(0)+'%';
+  $('why').innerHTML=`AI ensemble: বাড়ার সম্ভাবনা <b>${(P*100).toFixed(0)}%</b>, কমার ${((1-P)*100).toFixed(0)}% • মডেল ঐকমত্য ${votes}/3 • আস্থা: <b>${conf}</b>`+
+    (model.ht?` • বড় টাইমফ্রেম (${model.ht.tf}) ট্রেন্ড: ${model.ht.dir>0?'ঊর্ধ্বমুখী':'নিম্নমুখী'}`:'');
+  $('gate').innerHTML=ev.gate?'':`<div class="warn">⚠️ অদেখা ডেটায় AI-এর নির্ভুলতা সাধারণ অনুমানের চেয়ে উল্লেখযোগ্য ভালো নয় (${(ev.accE*100).toFixed(1)}% বনাম ${(ev.base*100).toFixed(1)}%)। তাই এই সেটিংয়ে সিগন্যাল বিশ্বাসযোগ্য নয়। বড় টাইমফ্রেম বা ভিন্ন ক্যান্ডেল সংখ্যা চেষ্টা করুন।</div>`;
+
+  /* ট্রেড প্ল্যান: ATR ভিত্তিক */
+  const A=atr(K.slice(-60)),k=Math.sqrt(h),sl=1.5*A*k,tp=2*A*k;
+  $('trade').innerHTML=side>0
+    ?`<tr><td>এন্ট্রি (বর্তমান)</td><td>${fmt(last)}</td></tr><tr><td>স্টপ-লস</td><td class="dn">${fmt(last-sl)}</td></tr><tr><td>টেক-প্রফিট</td><td class="up">${fmt(last+tp)}</td></tr><tr><td>রিস্ক:রিওয়ার্ড</td><td>1 : ${(tp/sl).toFixed(2)}</td></tr>`
+    :`<tr><td>এন্ট্রি (বর্তমান)</td><td>${fmt(last)}</td></tr><tr><td>স্টপ-লস</td><td class="dn">${fmt(last+sl)}</td></tr><tr><td>টেক-প্রফিট</td><td class="up">${fmt(last-tp)}</td></tr><tr><td>রিস্ক:রিওয়ার্ড</td><td>1 : ${(tp/sl).toFixed(2)}</td></tr>`;
+
+  /* পথ */
+  const f=[];let s=0,p=1;for(let i=1;i<=h;i++){p*=HS.phi;s+=p;f.push(HS.L+HS.T*s)}
+  const sd=HS.sd;
+  let rows='<tr><th>সময়</th><th>প্রাইস</th><th>সম্ভাব্য সীমা (95%)</th></tr>';
+  f.forEach((v,i)=>{const w=1.96*sd*Math.sqrt(i+1),t=new Date(Date.now()+(i+1)*MS[tf]);
+    rows+=`<tr><td>${t.toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'})}</td><td>${fmt(v)}</td><td>${fmt(v-w)} – ${fmt(v+w)}</td></tr>`});
+  $('fc').innerHTML=rows;
+
+  /* যাচাই টেবিল */
+  const pc=v=>(v*100).toFixed(1)+'%';
+  $('bt').innerHTML=`<tr><th>মডেল</th><th>অদেখা ডেটায় সঠিক দিক</th></tr>
+   <tr><td>সাধারণ অনুমান (বেসলাইন)</td><td>${pc(ev.base)}</td></tr>
+   <tr><td>Damped Holt ট্রেন্ড</td><td>${pc(ev.accH)}</td></tr>
+   <tr><td>Logistic Regression</td><td>${pc(ev.accL)}</td></tr>
+   <tr><td>Neural Network (MLP)</td><td>${pc(ev.accM)}</td></tr>
+   <tr><td><b>AI Ensemble</b></td><td><b>${pc(ev.accE)}</b></td></tr>
+   <tr><td>শুধু আস্থাবান সিগন্যালে (${ev.conf}টি)</td><td>${ev.confAcc==null?'--':pc(ev.confAcc)}</td></tr>`;
+  $('btnote').textContent=`পরীক্ষার নমুনা: ${ev.N}টি ক্যান্ডেল। প্রথম ৭০% ডেটায় ট্রেনিং, শেষ ৩০% অদেখা ডেটায় পরীক্ষা। ৫৫-৬০% হলেও এটি ভালো ধরা হয়, ১০০% কখনোই সম্ভব নয়।`;
+
+  const e10=I.e10[n-1],e20=I.e20[n-1],R=I.rsi[n-1],rc=a.slice(-20);
+  $('ind').innerHTML=`<tr><td>EMA10 / EMA20</td><td>${fmt(e10)} / ${fmt(e20)}</td></tr><tr><td>RSI(14)</td><td>${R.toFixed(1)}</td></tr><tr><td>MACD হিস্টোগ্রাম</td><td>${I.mh[n-1].toFixed(4)}</td></tr><tr><td>ATR(14)</td><td>${fmt(A)}</td></tr><tr><td>সাপোর্ট / রেজিস্ট্যান্স (শেষ ২০)</td><td>${fmt(Math.min(...rc))} / ${fmt(Math.max(...rc))}</td></tr>`;
+  draw(K.slice(-80),f,sd);
+}
+
+function draw(candles,f,sd){
+  const c=$('cv'),d=window.devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight;
+  if(!W||!H)return;
+  c.width=Math.round(W*d);c.height=Math.round(H*d);
+  const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,W,H);
+  const up=f.map((v,i)=>v+1.96*sd*Math.sqrt(i+1)),lo=f.map((v,i)=>v-1.96*sd*Math.sqrt(i+1));
+  const all=[...candles.map(v=>v.l),...candles.map(v=>v.h),...up,...lo];
+  let mn=Math.min(...all),mx=Math.max(...all),pad=(mx-mn)*.09||1;mn-=pad;mx+=pad;
+  const left=48,right=12,top=12,bottom=18,plotW=W-left-right,plotH=H-top-bottom,total=candles.length+f.length;
+  const X=i=>left+(i+.5)*plotW/total,Y=v=>top+(mx-v)/(mx-mn)*plotH;
+  const step=plotW/total,bodyW=Math.max(2,Math.min(8,step*.62));
+  const css=getComputedStyle(document.documentElement),grid=css.getPropertyValue('--bd').trim()||'#ddd';
+  const muted=css.getPropertyValue('--mu').trim()||'#777',gold=css.getPropertyValue('--gold').trim()||'#b8860b';
+  x.save();x.font='10px sans-serif';x.textAlign='right';x.textBaseline='middle';
+  for(let i=0;i<=4;i++){const value=mx-(mx-mn)*i/4,yy=Y(value);
+    x.strokeStyle=grid;x.setLineDash([2,4]);x.beginPath();x.moveTo(left,yy);x.lineTo(W-right,yy);x.stroke();x.setLineDash([]);
+    x.fillStyle=muted;x.fillText(fmt(value),left-7,yy)}
+  x.restore();
+  // সবুজ/লাল ক্যান্ডেল
+  candles.forEach((v,i)=>{const rising=v.c>=v.o,color=rising?'#16a34a':'#dc5252',xx=X(i);
+    x.strokeStyle=color;x.fillStyle=color;x.lineWidth=1.25;x.beginPath();x.moveTo(xx,Y(v.h));x.lineTo(xx,Y(v.l));x.stroke();
+    const y1=Y(Math.max(v.o,v.c)),y2=Y(Math.min(v.o,v.c));x.fillRect(xx-bodyW/2,y1,bodyW,Math.max(1.5,y2-y1))});
+  // পূর্বাভাসের ৯৫% সম্ভাব্য ব্যান্ড
+  x.save();x.beginPath();x.moveTo(X(candles.length-1),Y(candles[candles.length-1].c));
+  up.forEach((v,i)=>x.lineTo(X(candles.length+i),Y(v)));
+  for(let i=lo.length-1;i>=0;i--)x.lineTo(X(candles.length+i),Y(lo[i]));
+  x.closePath();x.fillStyle='rgba(184,134,11,.13)';x.fill();x.restore();
+  // পূর্বাভাসের পথ
+  x.save();x.strokeStyle=gold;x.lineWidth=2.2;x.setLineDash([5,4]);x.beginPath();
+  x.moveTo(X(candles.length-1),Y(candles[candles.length-1].c));
+  f.forEach((v,i)=>x.lineTo(X(candles.length+i),Y(v)));x.stroke();x.setLineDash([]);
+  f.forEach((v,i)=>{x.fillStyle=gold;x.beginPath();x.arc(X(candles.length+i),Y(v),2.3,0,Math.PI*2);x.fill()});x.restore();
+  // শেষ ২০টি ক্যান্ডেলের Low/High থেকে সাপোর্ট ও রেজিস্ট্যান্স
+  const recent=candles.slice(-20),support=Math.min(...recent.map(v=>v.l)),resistance=Math.max(...recent.map(v=>v.h));
+  const level=(value,color,label)=>{const yy=Y(value);x.save();x.strokeStyle=color;x.lineWidth=1.7;x.setLineDash([6,4]);
+    x.beginPath();x.moveTo(left,yy);x.lineTo(W-right,yy);x.stroke();x.setLineDash([]);
+    x.font='bold 10px sans-serif';const txt=label+' '+fmt(value),tw=x.measureText(txt).width+12;
+    const by=Math.max(top,Math.min(H-bottom-19,yy-18)),bx=Math.max(left+3,W-right-tw);
+    x.fillStyle=color;x.beginPath();x.roundRect(bx,by,tw,17,5);x.fill();
+    x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,bx+tw/2,by+8.5);x.restore()};
+  level(support,'#159653','সাপোর্ট');if(resistance!==support)level(resistance,'#cf4545','রেজিস্ট্যান্স');
+}
+$('metal').onchange=forceLoad;$('tf').onchange=forceLoad;$('h').onchange=forceLoad;
+load();setInterval(load,5000);
+</script>
+</body>
+</html>
