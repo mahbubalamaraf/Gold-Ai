@@ -23,18 +23,38 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Create Android Project
+      - name: Prepare App Files
         run: |
-          mkdir -p www
-          cp -r . www/
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          mkdir -p www assets
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='www' \
+            --exclude='android' \
+            --exclude='node_modules' \
+            ./ www/
 
-      - name: Configure Capacitor
+          cp icon.png assets/icon.png
+
+      - name: Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npm install --save-dev @capacitor/assets
+
+      - name: Configure Android
         run: |
           npx cap init "Gold AI" "com.goldai.app" --web-dir www
           npx cap add android
-          npx cap sync android
+
+      - name: Generate App Icon
+        run: |
+          npx capacitor-assets generate --android \
+            --iconBackgroundColor '#080D2B' \
+            --splashBackgroundColor '#080D2B'
+
+      - name: Sync Android
+        run: npx cap sync android
 
       - name: Build APK
         run: |
